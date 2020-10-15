@@ -4,7 +4,6 @@ import burp.AutoRepeater;
 import burp.BurpExtender;
 import burp.Logs.LogEntry;
 import burp.Logs.LogManager;
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.ButtonGroup;
@@ -33,6 +32,7 @@ public class Filters {
   private JPanel filtersButtonPanel;
   private JButton editFilterButton;
   private JButton deleteFilterButton;
+  private JButton duplicateFilterButton;
 
   // Filters Popup UI
   private JComboBox<String> booleanOperatorComboBox;
@@ -186,6 +186,7 @@ public class Filters {
         Filter tempFilter = filterTableModel.get(selectedRow);
 
         booleanOperatorComboBox.setSelectedItem(tempFilter.getBooleanOperator());
+        originalOrModifiedComboBox.setSelectedItem(tempFilter.getOriginalOrModified());
         matchTypeComboBox.setSelectedItem(tempFilter.getMatchType());
         matchRelationshipComboBox.setSelectedItem(tempFilter.getMatchRelationship());
         matchFilterTextField.setText(tempFilter.getMatchCondition());
@@ -228,9 +229,19 @@ public class Filters {
 
     filtersButtonPanel = new JPanel();
     filtersButtonPanel.setLayout(new GridBagLayout());
-    //filtersButtonPanel.setMinimumSize(AutoRepeater.buttonPanelDimension);
-    //filtersButtonPanel.setMaximumSize(AutoRepeater.buttonPanelDimension);
-    //filtersButtonPanel.setPreferredSize(AutoRepeater.buttonPanelDimension);
+
+    duplicateFilterButton = new JButton("Duplicate");
+    duplicateFilterButton.setPreferredSize(AutoRepeater.buttonDimension);
+    duplicateFilterButton.setMinimumSize(AutoRepeater.buttonDimension);
+    duplicateFilterButton.setMaximumSize(AutoRepeater.buttonDimension);
+
+    duplicateFilterButton.addActionListener(e -> {
+      int selectedRow = filterTable.getSelectedRow();
+      if (selectedRow != -1 && selectedRow < filterTableModel.getConditions().size()) {
+        filterTableModel.add(new Filter(filterTableModel.getFilters().get(selectedRow)));
+        filterTableModel.fireTableDataChanged();
+      }
+    });
 
     c = new GridBagConstraints();
     c.anchor = GridBagConstraints.FIRST_LINE_START;
@@ -240,6 +251,7 @@ public class Filters {
     filtersButtonPanel.add(addFilterButton, c);
     filtersButtonPanel.add(editFilterButton, c);
     filtersButtonPanel.add(deleteFilterButton, c);
+    filtersButtonPanel.add(duplicateFilterButton, c);
     filtersButtonPanel.add(whitelistFilterRadioButton, c);
     filtersButtonPanel.add(blacklistFilterRadioButton, c);
 

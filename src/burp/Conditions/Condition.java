@@ -25,11 +25,11 @@ public class Condition {
       String matchType,
       String matchRelationship,
       String matchCondition) {
-    setEnabled(true);
-    setBooleanOperator(booleanOperator);
-    setMatchType(matchType);
-    setMatchRelationship(matchRelationship);
-    setMatchCondition(matchCondition);
+    this(booleanOperator,
+        matchType,
+        matchRelationship,
+        matchCondition,
+        true);
   }
 
   public Condition(
@@ -43,6 +43,17 @@ public class Condition {
     setMatchType(matchType);
     setMatchRelationship(matchRelationship);
     setMatchCondition(matchCondition);
+  }
+
+  public Condition(Condition condition) {
+    this(condition.getBooleanOperator(),
+        condition.getMatchType(),
+        condition.getMatchRelationship(),
+        condition.getMatchCondition(),
+        condition.isEnabled());
+    if (getBooleanOperator().equals("")) {
+      setBooleanOperator("And");
+    }
   }
 
   public static final String[] BOOLEAN_OPERATOR_OPTIONS = {
@@ -320,7 +331,7 @@ public class Condition {
 
   private boolean checkFileExtension(IHttpRequestResponse messageInfo) {
     IRequestInfo analyzedRequest = BurpExtender.getHelpers().analyzeRequest(messageInfo);
-    String fileExtension = Files.getFileExtension(analyzedRequest.getUrl().toString());
+    String fileExtension = Files.getFileExtension(analyzedRequest.getUrl().getPath().toString());
     switch (this.matchRelationship) {
       case "Matches":
         return fileExtension.matches(this.matchCondition);
